@@ -1,10 +1,10 @@
-package vishal.flink.overspeed.alert.sink;
+package vishal.share.live.location.sink;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.apache.flink.streaming.api.functions.sink.SinkFunction;
-import vishal.flink.overspeed.alert.model.Alert;
+import vishal.share.live.location.model.LocationData;
 
 @Slf4j
 public class SSESink implements SinkFunction<String> {
@@ -39,9 +39,9 @@ public class SSESink implements SinkFunction<String> {
 
     private String getDeviceLevelEndpoint(String event){
         try {
-            Alert alert = mapper.readValue(event, Alert.class);
+            LocationData locationData = mapper.readValue(event, LocationData.class);
             StringBuilder builder = new StringBuilder();
-            builder.append(sseEndpointUrl).append(alert.getDeviceId());
+            builder.append(sseEndpointUrl).append(locationData.getDeviceId());
             return builder.toString();
         }catch (Exception e){
             log.error("Exception: {}", e);

@@ -1,4 +1,4 @@
-package vishal.flink.overspeed.alert.serdeser;
+package vishal.share.live.location.serdeser;
 
 import org.apache.flink.streaming.connectors.kafka.KafkaSerializationSchema;
 import org.apache.kafka.clients.producer.ProducerRecord;

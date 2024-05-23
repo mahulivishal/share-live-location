@@ -9,11 +9,11 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vishal.flink.overspeed.alert.filters.NullFilters;
-import vishal.flink.overspeed.alert.process.OverSpeedProccessor;
-import vishal.flink.overspeed.alert.sink.SSESink;
+import vishal.share.live.location.filters.NullFilters;
 import vishal.share.live.location.map.LocationDataMapper;
 import vishal.share.live.location.model.LocationData;
+import vishal.share.live.location.process.ShareLiveLocationProcessor;
+import vishal.share.live.location.sink.SSESink;
 
 import java.util.Properties;
 
@@ -52,7 +52,7 @@ public class App {
                 .map(new LocationDataMapper()).setParallelism(1).name("data-mapper")
                 .filter(new NullFilters<LocationData>()).setParallelism(1).name("null-filter")
                 .keyBy(LocationData::getDeviceId)
-                .process(new OverSpeedProccessor()).setParallelism(1).name("location-ping-processor");
+                .process(new ShareLiveLocationProcessor()).setParallelism(1).name("location-ping-processor");
         locationDataStream.addSink(new SSESink(sseEndpoint)).setParallelism(1).name("sse-sink");
     }
 

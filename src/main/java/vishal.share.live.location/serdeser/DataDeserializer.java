@@ -1,4 +1,4 @@
-package vishal.flink.overspeed.alert.serdeser;
+package vishal.share.live.location.serdeser;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NoArgsConstructor;
