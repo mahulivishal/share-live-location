@@ -1,4 +1,4 @@
-package vishal.flink.overspeed.alert;
+package vishal.share.live.location;
 
 import org.apache.flink.api.common.RuntimeExecutionMode;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
@@ -7,14 +7,13 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import vishal.flink.overspeed.alert.filters.NullFilters;
-import vishal.flink.overspeed.alert.map.SpeedDataMapper;
-import vishal.flink.overspeed.alert.model.SpeedData;
 import vishal.flink.overspeed.alert.process.OverSpeedProccessor;
 import vishal.flink.overspeed.alert.sink.SSESink;
+import vishal.share.live.location.map.LocationDataMapper;
+import vishal.share.live.location.model.LocationData;
 
 import java.util.Properties;
 
@@ -25,7 +24,7 @@ public class App {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setRuntimeMode(RuntimeExecutionMode.STREAMING);
         env.getCheckpointConfig().setCheckpointingMode(CheckpointingMode.AT_LEAST_ONCE);
-        env.getCheckpointConfig().setCheckpointStorage("file:///Users/g0006686/Desktop/checkpoints");
+        env.getCheckpointConfig().setCheckpointStorage("file:///Users/g0006686/Desktop/checkpoints/share-live-location");
         env.enableCheckpointing(5000L);
         env.getCheckpointConfig().setMinPauseBetweenCheckpoints(5000L);
         env.getCheckpointConfig().setCheckpointTimeout(2000L);
@@ -35,38 +34,26 @@ public class App {
                         CheckpointConfig.ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION);
         // Setting state backend with incremental checkpointing enabled
         process(env);
-        env.execute("Vishal Flink Alert Overspeed");
+        env.execute("Vishal Share Live Location");
     }
 
     private static void process(StreamExecutionEnvironment env) throws Exception {
         Properties consumerProps = new Properties();
         consumerProps.setProperty("bootstrap.servers", "localhost:9092");
-        consumerProps.setProperty("group.id", "test");
+        consumerProps.setProperty("group.id", "location-pings");
         Properties producerProps = new Properties();
         producerProps.setProperty("bootstrap.servers", "localhost:9092");
         producerProps.setProperty("acks", "1");
-        String sseEndpoint = "http://localhost:8083/overspeed-alert/sse/";
+        String sseEndpoint = "http://localhost:8083/share-live-location/";
 
-        FlinkKafkaConsumer<String> speedDataSource = new FlinkKafkaConsumer<String>("over.speed.alert.source.v1",
+        FlinkKafkaConsumer<String> locationDataSource = new FlinkKafkaConsumer<String>("share.live.location.gps.source.v1",
                 new SimpleStringSchema(), consumerProps);
-        DataStream<String> speedDataStream = env.addSource(speedDataSource).setParallelism(1).name("speed-data-source")
-                .map(new SpeedDataMapper()).setParallelism(1).name("data-mapper")
-                .filter(new NullFilters<SpeedData>()).setParallelism(1).name("null-filter")
-                .keyBy(SpeedData::getDeviceId)
-                .process(new OverSpeedProccessor()).setParallelism(1).name("over-speed-processor");
-        speedDataStream.addSink(new FlinkKafkaProducer<>("over.speed.alert.sink.v1", new SimpleStringSchema(), producerProps)).setParallelism(1).name("alert-sink");
-       /* speedDataStream.addSink(new FlinkKafkaProducer<KafkaRecord>("over.speed.alert.sink.v1",
-                new KafkaRecordSerializer("over.speed.alert.sink.v1"), producerProps, FlinkKafkaProducer.Semantic.AT_LEAST_ONCE))
-                .setParallelism(1).name("over-speed-sink");*/
-
-        FlinkKafkaConsumer<String> speedDataSourceSSE = new FlinkKafkaConsumer<String>("over.speed.alert.source.sse.v1",
-                new SimpleStringSchema(), consumerProps);
-        DataStream<String> speedDataStreamSSE = env.addSource(speedDataSourceSSE).setParallelism(1).name("speed-data-source")
-                .map(new SpeedDataMapper()).setParallelism(1).name("data-mapper")
-                .filter(new NullFilters<SpeedData>()).setParallelism(1).name("null-filter")
-                .keyBy(SpeedData::getDeviceId)
-                .process(new OverSpeedProccessor()).setParallelism(1).name("over-speed-processor");
-        speedDataStreamSSE.addSink(new SSESink(sseEndpoint)).setParallelism(1).name("sse-sink");
+        DataStream<String> locationDataStream = env.addSource(locationDataSource).setParallelism(1).name("location-data-source")
+                .map(new LocationDataMapper()).setParallelism(1).name("data-mapper")
+                .filter(new NullFilters<LocationData>()).setParallelism(1).name("null-filter")
+                .keyBy(LocationData::getDeviceId)
+                .process(new OverSpeedProccessor()).setParallelism(1).name("location-ping-processor");
+        locationDataStream.addSink(new SSESink(sseEndpoint)).setParallelism(1).name("sse-sink");
     }
 
     }
