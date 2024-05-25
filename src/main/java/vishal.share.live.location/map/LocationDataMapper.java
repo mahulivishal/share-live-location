@@ -12,7 +12,7 @@ public class LocationDataMapper implements MapFunction<String, LocationData> {
     public LocationData map (String event) throws Exception {
         try {
             LocationData locationData = mapper.readValue(event, LocationData.class);
-            log.info("locationData: {}", locationData);
+            log.debug("locationData: {}", locationData);
             return locationData;
         } catch (Exception e) {
             log.error("locationData ERROR: {}", event);

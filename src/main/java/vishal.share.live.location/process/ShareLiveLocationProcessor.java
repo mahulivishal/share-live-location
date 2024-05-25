@@ -29,13 +29,14 @@ public class ShareLiveLocationProcessor extends KeyedProcessFunction<String, Loc
     public void processElement(LocationData locationData, KeyedProcessFunction<String, LocationData, String>.Context context, Collector<String> collector) throws Exception {
         DeviceState deviceState = deviceStateValueState.value();
         if(null == deviceState){
+            log.info("Initialising deviceState for: {}", locationData.getDeviceId());
             updateState(locationData);
             collector.collect(mapper.writeValueAsString(locationData));
         }
         else {
            if(locationData.getTimestamp() > deviceState.getTimestamp()) {
              if(!locationData.getLatitude().equals(deviceState.getLatitude()))  {
-                 if(locationData.getLongitude().equals(deviceState.getLongitude())){
+                 if(!locationData.getLongitude().equals(deviceState.getLongitude())){
                      updateState(locationData);
                      collector.collect(mapper.writeValueAsString(locationData));
                  }

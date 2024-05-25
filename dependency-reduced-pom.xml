@@ -20,7 +20,7 @@
             <configuration>
               <transformers>
                 <transformer>
-                  <mainClass>vishal.flink.overspeed.alert.App</mainClass>
+                  <mainClass>vishal.share.live.location.App</mainClass>
                 </transformer>
               </transformers>
             </configuration>
