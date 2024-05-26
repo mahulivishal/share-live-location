@@ -8,7 +8,7 @@ import reactor.core.publisher.Sinks;
 import vishal.sse.server.service.EventSinkService;
 
 @RestController
-@RequestMapping("/overspeed-alert")  // Base path for this controller
+@RequestMapping("/share-live-location")  // Base path for this controller
 @Slf4j
 public class SSEController {
 
@@ -18,7 +18,7 @@ public class SSEController {
         this.eventSinkService = eventSinkService;
     }
 
-    @GetMapping(value = "/sse/{id}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(value = "/{id}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> streamEvents(@PathVariable String id) {
         Sinks.Many<String> sink = eventSinkService.getSink(id);
         if (sink == null) {
@@ -28,7 +28,7 @@ public class SSEController {
         return sink.asFlux().map(data -> "data:" + data + "\n\n");
     }
 
-    @PostMapping(value = "/sse/{id}")
+    @PostMapping(value = "/{id}")
     public void pushEvent(@PathVariable String id, @RequestBody String data) {
         Sinks.Many<String> sink = eventSinkService.getSink(id);
         if (sink != null) {

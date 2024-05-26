@@ -6,7 +6,7 @@
 <body>
     <div id="events"></div>
     <script>
-        const eventSource = new EventSource('http://localhost:8083/overspeed-alert/sse/d_01');
+        const eventSource = new EventSource('http://localhost:8083/share-live-location/d_01');
         eventSource.onmessage = function(event) {
             const newElement = document.createElement("div");
             newElement.textContent = event.data;
