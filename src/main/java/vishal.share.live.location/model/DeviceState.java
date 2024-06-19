@@ -1,4 +1,4 @@
-package vishal.flink.overspeed.alert.model;
+package vishal.share.live.location.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

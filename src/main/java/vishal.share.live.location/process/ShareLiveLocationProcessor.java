@@ -7,8 +7,8 @@ import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.util.Collector;
+import vishal.share.live.location.model.DeviceState;
 import vishal.share.live.location.model.LocationData;
-import vishal.flink.overspeed.alert.model.DeviceState;
 
 import java.io.IOException;
 

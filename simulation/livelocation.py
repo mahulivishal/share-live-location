@@ -5,7 +5,7 @@ import time
 from pykafka import KafkaClient
 
 kafka_brokers = "localhost:9092"
-location_source_data_topic = "share.live.location.gps.source.v1"
+location_source_data_topic = "device.bms.data.source.v1"
 client = KafkaClient(hosts=kafka_brokers)
 topic = client.topics[location_source_data_topic]
 producer = topic.get_sync_producer()
